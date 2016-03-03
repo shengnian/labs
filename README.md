@@ -1,1 +1,1 @@
-# this's labs for everone.
+# this labs for everyone to share, learning.

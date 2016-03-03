@@ -1,22 +1,29 @@
 import { App, Home, Login, Ucenter} from './lib/component'
 import * as reducers from './lib/reducers';
 
-
-import { combineReducers, createStore }  from 'redux';
+import { combineReducers, createStore, applyMiddleware, compose }  from 'redux';
 import { Provider } from 'react-redux';
-import { Router, Route, browserHistory, IndexRoute } from 'react-router';
-import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
+import createBrowserHistory from 'history/lib/createBrowserHistory';
+import { Router, Route, IndexRoute, useRouterHistory } from 'react-router';
+import { syncHistoryWithStore, routerReducer as router, routerMiddleware } from 'react-router-redux';
 
+const browserHistory = useRouterHistory(createBrowserHistory)({
+  basename: ''
+});
+const initialState = window.__INITIAL_STATE__;
+
+const configStore = applyMiddleware(routerMiddleware(browserHistory));
 
 const reducer = combineReducers ({
 	...reducers,
-	routing: routerReducer
+	router
 });
 
-const store = createStore(
-  reducer,
-)
-const history = syncHistoryWithStore( browserHistory, store );
+const store = configStore(createStore)(reducer, initialState);
+const history = syncHistoryWithStore(browserHistory, store, {
+  selectLocationState: (state) => state.router
+});
+
 
 function authIs (next,href) {
 	let state = store.getState();

@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "set NODE_ENV=1&& webpack --progress --colors",
     "dist": "set NODE_ENV=0&& webpack --progress --colors",
-    "run": "webpack-dev-server --hot --history-api-fallback  --open"
+    "start": "webpack-dev-server --hot --history-api-fallback  --open"
   },
   "author": "",
   "license": "ISC",
@@ -35,5 +35,8 @@
     "style-loader": "^0.13.0",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1"
+  },
+  "dependencies": {
+    "history": "^2.0.1"
   }
 }
