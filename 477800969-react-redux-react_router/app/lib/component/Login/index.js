@@ -4,7 +4,8 @@ let Link = Router.Link;
 import { setLogin, setLogout } from '../../actions/Alogin.js'
 import { setUser } from '../../actions/Auser.js'
 import { connect } from 'react-redux'
-import { browserHistory } from 'react-router'
+// import { browserHistory } from 'react-router'
+import { push } from 'react-router-redux';
 
 const Login =  React.createClass({
 	getInitialState:function() {
@@ -13,6 +14,7 @@ const Login =  React.createClass({
 	    };
 	},
 	submit:function(e){
+		const { dispatch } = this.context.store;
 		e.preventDefault();
 		let that = this;
 		let user ={
@@ -21,17 +23,20 @@ const Login =  React.createClass({
 		};
 		get('/data/login.json')
 		.then(function  (data) {
+			console.log(user.username)
 			if(user.username !== data.data.user || user.password !== data.data.pass){
 				that.setState({ showmsg:'帐号或者密码错误' });
 				that.props.setLogout()
+				console.log(this.state.login)
 			}else{
 				that.setState({ showmsg:'登录成功' });
 				that.props.setLogin()
 				that.props.setUser(user)
-				browserHistory.push('/ucenter')
+				console.log('=======' + this.state.login)
+				// dispatch(push('/ucenter'));
 			}
 		})
-		
+
 	},
 	focus:function  () {
 		this.setState({showmsg:''})
@@ -53,7 +58,7 @@ const Login =  React.createClass({
 					<button type='reset'>重置</button>
 				</p>
 				{ this.state.showmsg }
-				 
+
 			</form>
 		</div>
 	}

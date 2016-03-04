@@ -7,17 +7,32 @@ import createBrowserHistory from 'history/lib/createBrowserHistory';
 import { Router, Route, IndexRoute, useRouterHistory } from 'react-router';
 import { syncHistoryWithStore, routerReducer as router, routerMiddleware } from 'react-router-redux';
 
+import {persistState} from 'redux-devtools';
+import {createDevTools} from 'redux-devtools';
+import LogMonitor from 'redux-devtools-log-monitor';
+import DockMonitor from 'redux-devtools-dock-monitor'
+
 const browserHistory = useRouterHistory(createBrowserHistory)({
   basename: ''
 });
 const initialState = window.__INITIAL_STATE__;
 
-const configStore = applyMiddleware(routerMiddleware(browserHistory));
+
+const DevTools = createDevTools(
+  <DockMonitor
+    toggleVisibilityKey='H'
+    changePositionKey='Q'>
+    <LogMonitor/>
+  </DockMonitor>
+);
+
+const configStore = compose(applyMiddleware(routerMiddleware(browserHistory)), DevTools.instrument());
 
 const reducer = combineReducers ({
 	...reducers,
 	router
 });
+
 
 const store = configStore(createStore)(reducer, initialState);
 const history = syncHistoryWithStore(browserHistory, store, {
@@ -25,14 +40,14 @@ const history = syncHistoryWithStore(browserHistory, store, {
 });
 
 
-function authIs (next,href) {
+function authIs (next, href) {
 	let state = store.getState();
 	if(!state.login){
-		href({
-			pathname:'/login'
-		})
+      store.dispatch( push('/login'));
 	}
 }
+
+
 
 const rootRouter = <Router history={history}>
 	<Route path='/' component={App}>
@@ -44,6 +59,9 @@ const rootRouter = <Router history={history}>
 
 ReactDOM.render(
 	<Provider store={store}>
-			{rootRouter}
+		<div style={{ height: '100%' }}>
+				{rootRouter}
+				<DevTools/>
+		</div>
 	</Provider>
 ,document.getElementById('main'))
